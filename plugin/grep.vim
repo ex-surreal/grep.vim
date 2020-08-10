@@ -1,8 +1,12 @@
-if exists("g:grep_vim_loaded") 
+if exists("g:grep_vim_loaded")
   finish
 endif
 
 let g:grep_vim_loaded = 1
+
+function! s:unletJob(ch, data, event)
+  unlet g:uc_grep_running_job
+endfunction
 
 function! s:putInQuickFix(ch, expr)
   caddexpr a:expr
@@ -20,6 +24,7 @@ function! s:jobStart(command)
   if has('nvim')
     return jobstart(a:command, {
           \ 'on_stdout': function('s:putInQuickFixNvim'),
+          \ 'on_exit': function('s:unletJob')
           \ })
   else
     return job_start(a:command, {
